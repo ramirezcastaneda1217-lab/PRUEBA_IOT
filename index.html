@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de lámpara</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            text-align: center;
+            padding: 60px 15px;
+        }
+
+        .contenedor {
+            background: white;
+            max-width: 400px;
+            margin: auto;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px #0002;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        #estado {
+            font-size: 23px;
+            font-weight: bold;
+            margin: 30px 0;
+            color: gray;
+        }
+
+        button {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #125ca5;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="contenedor">
+    <h2>💡 Control de lámpara</h2>
+
+    <div id="estado">Estado desconocido</div>
+
+    <button onclick="consultarLampara()">
+        Consultar lámpara
+    </button>
+</div>
+
+<script>
+async function consultarLampara() {
+
+    const estado = document.getElementById("estado");
+
+    estado.innerHTML = "Consultando...";
+    estado.style.color = "orange";
+
+    const url = "https://cygnus.uniajc.edu.co/appis/edispositivo.php?id=1&c=mar&v=on";
+
+    try {
+        const respuesta = await fetch(url);
+        const resultado = await respuesta.text();
+
+        if (!respuesta.ok) {
+            throw new Error("Error HTTP " + respuesta.status);
+        }
+
+        const texto = resultado.toLowerCase();
+
+        if (texto.includes("off") || texto.includes("apagado")) {
+            estado.innerHTML = "🔴 LÁMPARA APAGADA";
+            estado.style.color = "red";
+        }
+        else if (texto.includes("on") || texto.includes("encendido")) {
+            estado.innerHTML = "🟢 LÁMPARA ENCENDIDA";
+            estado.style.color = "green";
+        }
+        else {
+            estado.innerHTML = "Respuesta recibida, pero no se pudo identificar el estado";
+            estado.style.color = "orange";
+        }
+
+    } catch (error) {
+        estado.innerHTML = "⚠️ Error al consultar la lámpara";
+        estado.style.color = "red";
+        console.error(error);
+    }
+}
+</script>
+
+</body>
+</html>
